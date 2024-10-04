@@ -34,24 +34,45 @@ export const doLogin = async () => {
 }
 
 // função que possibilita a interação com o contrato
-// nao precisa ter o export
-const getContract = async () => {
+export const getContract = async () => {
     const provider = window.ethereum;
-    // precisamos saber se o navegador do user possui a metamask instalada
     if (!provider) {
         throw new Error("Metamask não está instalada");
     }
 
     const from = localStorage.getItem("wallet");
-    // instanciamos o web3
-    const web3 = new Web3(provider);
+    const web3 = new Web3(provider);  // instanciar web3 corretamente aqui
     const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS, { from });
-    return contract;
+
+    // Retorne o contrato e a instância de web3
+    return { contract, web3 };
 }
+
 
 // recupera os dados da dispouta
 export const getDispute = async () => {
-    const contract = await getContract();
+    const { contract } = await getContract();
     return contract.methods.dispute().call();
 }
+
+// realiza a aposta no candidato e envia uma quantia de moeda
+export const placeBet = async (candidate, amountInETH) => {
+    const { contract, web3 } = await getContract();  
+
+    // Obter preço atual do gas
+    const gasPrice = await web3.eth.getGasPrice();
+
+    // Estimar o limite de gas
+    const gasEstimate = await contract.methods.bet(candidate).estimateGas({
+        value: web3.utils.toWei(amountInETH, "ether"),
+    });
+
+    return contract.methods.bet(candidate).send({
+        value: web3.utils.toWei(amountInETH, "ether"),
+        gas: gasEstimate,
+        gasPrice: gasPrice
+    });
+};
+
+
 

@@ -3,7 +3,8 @@ import Head from "next/head";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getDispute } from "@/services/Web3Services";
+import { getDispute, placeBet } from "@/services/Web3Services";
+import Web3 from "web3";
 
 
 export default function Bet() {
@@ -40,6 +41,19 @@ export default function Bet() {
 
     }, []); //! aqui colocamos um array vazio para indicar que queremos que dipare uma única vez quando a página for renderizada
 
+
+    const proccessBet = async (candidate) => {
+        setMessage('Conectando à metamask. Por favor aguarde...');
+        const amount = prompt("Quantia em POL para apostar: ", "1");
+        placeBet(candidate, amount).then(() => {
+            alert('Aposta recebida com sucesso! Pode demorar até 1 minuto para aparecer no sistema');
+            setMessage('');
+        }).catch((error) => {
+            console.error(error);
+            setMessage(error.message);
+        });
+    }
+
     return (
         <>
             <Head>
@@ -59,20 +73,20 @@ export default function Bet() {
                 <div className="row flex-lg-row-reverse align-items-center g-1 py-5">
                     <div className="col"></div>
                     <div className="col">
-                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate2}</h3>
-                        <img width={250}
-                            src={dispute.image2}
-                            className="d-block mx-auto img-fluid rounded" />
-                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto">Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{dispute.total2} POL apostados</span>
-                    </div>
-                    <div className="col">
                         <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate1}</h3>
                         <img width={250}
                             src={dispute.image1}
                             className="d-block mx-auto img-fluid rounded" />
-                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto">Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{dispute.total1} POL apostados</span>
+                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(1)}>Aposto nesse candidato</button>
+                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{ Web3.utils.fromWei(dispute.total1, "ether")} POL apostados</span>
+                    </div>
+                    <div className="col">
+                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate2}</h3>
+                        <img width={250}
+                            src={dispute.image2}
+                            className="d-block mx-auto img-fluid rounded" />
+                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(2)}>Aposto nesse candidato</button>
+                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{ Web3.utils.fromWei(dispute.total2, "ether")} POL apostados</span>
                     </div>
                 </div>
 
