@@ -1,7 +1,44 @@
+"use client"; // isso indica que essa página deve ser renderizada no navegador do client
 import Head from "next/head";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { getDispute } from "@/services/Web3Services";
 
 
-export default function Home() {
+export default function Bet() {
+
+    const { push } = useRouter();
+
+    const [message, setMessage] = useState();
+
+    // dados da dispusta com valores padrão enquanto carrega os dados da blockchain
+    const [dispute, setDispute] = useState({
+        candidate1: 'Loading...',
+        candidate2: 'Loading...',
+        image1: 'https://i0.wp.com/www.tecstudio.com.br/wp-content/uploads/2020/06/WhatsApp-Image-2020-05-31-at-11.27.40-1.jpeg?fit=640%2C450&ssl=1',
+        image2: 'https://i0.wp.com/www.tecstudio.com.br/wp-content/uploads/2020/06/WhatsApp-Image-2020-05-31-at-11.27.40-1.jpeg?fit=640%2C450&ssl=1',
+        total1: 0,
+        total2: 0,
+        winner: 0,
+    });
+
+    //! se não tem no localStorage o endereço da carteira, então enviamos
+    //! para a raiz do site
+    useEffect(() => {
+        if(!localStorage.getItem('wallet')){
+            return push('/');
+        }
+        setMessage('Carregando dados da disputa...');
+        getDispute().then(dispute => {
+            setDispute(dispute);
+            setMessage('');
+        }).catch(error => {
+            console.error(error);
+            setMessage(error.message);
+        });
+
+    }, []); //! aqui colocamos um array vazio para indicar que queremos que dipare uma única vez quando a página for renderizada
 
     return (
         <>
@@ -22,25 +59,25 @@ export default function Home() {
                 <div className="row flex-lg-row-reverse align-items-center g-1 py-5">
                     <div className="col"></div>
                     <div className="col">
-                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">Donald Trump</h3>
+                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate2}</h3>
                         <img width={250}
-                            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Donald_Trump_official_portrait_%28cropped%29.jpg"
+                            src={dispute.image2}
                             className="d-block mx-auto img-fluid rounded" />
                         <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto">Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>0 POL apostados</span>
+                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{dispute.total2} POL apostados</span>
                     </div>
                     <div className="col">
-                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">Donald Trump</h3>
+                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate1}</h3>
                         <img width={250}
-                            src="https://upload.wikimedia.org/wikipedia/commons/5/53/Donald_Trump_official_portrait_%28cropped%29.jpg"
+                            src={dispute.image1}
                             className="d-block mx-auto img-fluid rounded" />
                         <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto">Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>0 POL apostados</span>
+                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{dispute.total1} POL apostados</span>
                     </div>
                 </div>
 
                 <div className="row align-items-center">
-                    <p className="message"></p>
+                    <p className="message">{message}</p>
                 </div>
 
                 <footer className="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
