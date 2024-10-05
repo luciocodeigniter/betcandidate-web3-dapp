@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getDispute, placeBet } from "@/services/Web3Services";
+import { claimPrize, getDispute, placeBet } from "@/services/Web3Services";
 import Web3 from "web3";
 
 
@@ -27,7 +27,7 @@ export default function Bet() {
     //! se não tem no localStorage o endereço da carteira, então enviamos
     //! para a raiz do site
     useEffect(() => {
-        if(!localStorage.getItem('wallet')){
+        if (!localStorage.getItem('wallet')) {
             return push('/');
         }
         setMessage('Carregando dados da disputa...');
@@ -50,7 +50,18 @@ export default function Bet() {
             setMessage('');
         }).catch((error) => {
             console.error(error);
-            setMessage(error.message);
+            setMessage(error.data ? error.data.message : error.message);
+        });
+    }
+
+    const btnClaimClick = async () => {
+        setMessage('Conectando à metamask. Por favor aguarde...');
+        claimPrize().then(() => {
+            alert('Prêmio coletado com sucesso! Pode demorar até 1 minuto para aparecer na sua carteira');
+            setMessage('');
+        }).catch((error) => {
+            console.error(error);
+            setMessage(error.data ? error.data.message : error.message);
         });
     }
 
@@ -66,28 +77,51 @@ export default function Bet() {
                     <div className="col-12">
                         <h1 className="display-5 fw-bold text-body-emphasis lh-1 mb-3">BetCandidate</h1>
                         <p className="lead">Apostas nas eleições americanas</p>
-                        <p className="lead">Aposte em um dos candidatos até o dia da eleição</p>
+                        {
+                            dispute.winner == 0
+                                ? <p className="lead">Aposte em um dos candidatos até o dia da eleição</p>
+                                : <p className="lead">Disputa encerrada. Veja o vencedor e solicite seu prêmio.</p>
+                        }
                     </div>
                 </div>
 
                 <div className="row flex-lg-row-reverse align-items-center g-1 py-5">
                     <div className="col"></div>
-                    <div className="col">
-                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate1}</h3>
-                        <img width={250}
-                            src={dispute.image1}
-                            className="d-block mx-auto img-fluid rounded" />
-                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(1)}>Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{ Web3.utils.fromWei(dispute.total1, "ether")} POL apostados</span>
-                    </div>
-                    <div className="col">
-                        <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate2}</h3>
-                        <img width={250}
-                            src={dispute.image2}
-                            className="d-block mx-auto img-fluid rounded" />
-                        <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(2)}>Aposto nesse candidato</button>
-                        <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{ Web3.utils.fromWei(dispute.total2, "ether")} POL apostados</span>
-                    </div>
+                    {
+                        dispute.winner == 0 || dispute.winner == 1
+                            ? <div className="col">
+                                <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate1}</h3>
+                                <img width={250}
+                                    src={dispute.image1}
+                                    className="d-block mx-auto img-fluid rounded" />
+                                {
+                                    dispute.winner == 1
+                                        ? <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={btnClaimClick}>Pegar meu prêmio</button>
+                                        : <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(1)}>Aposto nesse candidato</button>
+                                }
+                                <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{Web3.utils.fromWei(dispute.total1, "ether")} POL apostados</span>
+                            </div>
+                            : <></>
+                    }
+                    {
+                        dispute.winner == 0 || dispute.winner == 2
+                            ? <div className="col">
+                                <h3 style={{ width: 250 }} className="my-2 d-block mx-auto">{dispute.candidate2}</h3>
+                                <img width={250}
+                                    src={dispute.image2}
+                                    className="d-block mx-auto img-fluid rounded" />
+                                
+                                {
+                                    dispute.winner == 2
+                                        ? <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={btnClaimClick}>Pegar meu prêmio</button>
+                                        : <button type="button" className="btn btn-primary btn-lg p-3 my-2 d-block mx-auto" onClick={() => proccessBet(2)}>Aposto nesse candidato</button>
+                                }
+
+                                <span className="badge rounded-pill bg-secondary d-block mx-auto" style={{ width: 250 }}>{Web3.utils.fromWei(dispute.total2, "ether")} POL apostados</span>
+                            </div>
+                            : <></>
+                    }
+
                 </div>
 
                 <div className="row align-items-center">

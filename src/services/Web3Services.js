@@ -2,7 +2,7 @@ import Web3 from "web3";
 import ABI from "./ABI.json";
 
 // deployed com POL
-const CONTRACT_ADDRESS = '0x6abf74FC1a38F6500e9601710D99F584A2f96Ac3';
+const CONTRACT_ADDRESS = '0xa9139F7CFdB32AE33167305f524B516D7e7BC9f8';
 
 export const doLogin = async () => {
 
@@ -52,12 +52,12 @@ export const getContract = async () => {
 // recupera os dados da dispouta
 export const getDispute = async () => {
     const { contract } = await getContract();
-    return contract.methods.dispute().call();
+    return await contract.methods.dispute().call();
 }
 
 // realiza a aposta no candidato e envia uma quantia de moeda
 export const placeBet = async (candidate, amountInETH) => {
-    const { contract, web3 } = await getContract();  
+    const { contract, web3 } = await getContract();
 
     // Obter preço atual do gas
     const gasPrice = await web3.eth.getGasPrice();
@@ -67,12 +67,46 @@ export const placeBet = async (candidate, amountInETH) => {
         value: web3.utils.toWei(amountInETH, "ether"),
     });
 
-    return contract.methods.bet(candidate).send({
+    return await contract.methods.bet(candidate).send({
         value: web3.utils.toWei(amountInETH, "ether"),
         gas: gasEstimate,
         gasPrice: gasPrice
     });
 };
 
+// realiza o encerramento da aposta
+// TODO criar página administrativa que só o address owner do contrato poderá executar essa função
+export const finish = async (winner) => {
+    const { contract, web3 } = await getContract();
+
+    // Obter preço atual do gas
+    const gasPrice = await web3.eth.getGasPrice();
+
+    // Estimar o limite de gas
+    const gasEstimate = await contract.methods.bet(winner).estimateGas({
+        value: web3.utils.toWei(amountInETH, "ether"),
+    });
+
+    return await contract.methods.finish(winner).send({
+        gas: gasEstimate,
+        gasPrice: gasPrice
+    });
+};
+
+// realiza a solicitação de retirada do prêmio
+export const claimPrize = async () => {
+    const { contract, web3 } = await getContract();
+
+    // Obter preço atual do gas
+    const gasPrice = await web3.eth.getGasPrice();
+
+    // Estimar o limite de gas para o método claim
+    const gasEstimate = await contract.methods.claim().estimateGas();
+
+    return await contract.methods.claim().send({
+        gas: gasEstimate,  // Usar a estimativa de gas
+        gasPrice: gasPrice // Usar o preço de gas dinâmico
+    });
+};
 
 

@@ -1,36 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DApp de Votação com Smart Contract
 
-## Getting Started
+Este projeto é uma aplicação descentralizada (DApp) que permite aos usuários interagir com um contrato inteligente desenvolvido em **Solidity**, utilizando **React** para a interface de usuário e integração com **MetaMask** para transações na blockchain.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Interação com contrato inteligente**: Usuários podem realizar votações e visualizar resultados, utilizando um contrato inteligente que gerencia as operações.
+- **MetaMask Integration**: Conecte sua carteira digital e faça transações diretamente pela aplicação.
+- **Desenvolvimento com Solidity**: O contrato foi desenvolvido para gerenciar a votação de forma transparente e segura.
+- **Retirada de Prêmios**: Sistema de solicitação de prêmios após o encerramento das votações.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tecnologias Utilizadas
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Solidity**: Linguagem utilizada para o desenvolvimento dos contratos inteligentes.
+- **React**: Framework utilizado para o desenvolvimento da interface da aplicação.
+- **MetaMask**: Usado para integração da carteira digital e interação com a blockchain.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
